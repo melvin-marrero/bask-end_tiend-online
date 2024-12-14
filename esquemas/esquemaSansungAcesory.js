@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 
 const sansungAcesoySquema =new mongoose.Schema({
-    id:{type:Object},
     nombre:{type:String,require:true,unique:true},
     precio:{type:Number,require:true,},
     cantidaDisponible:{type:Number,require:true},

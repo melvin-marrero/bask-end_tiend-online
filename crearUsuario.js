@@ -10,10 +10,7 @@ const isAdmin = true;
 async function createUser() {
   try {
     // Conectar a la base de datos
-    await mongoose.connect('mongodb://localhost:27017/admin', {
-      useNewUrlParser: true,
-      useUnifiedTopology: true
-    });
+    await mongoose.connect(process.env.db_conetion);
     console.log('Conectado a la base de datos');
 
     // Verificar si el usuario ya existe

@@ -20,7 +20,7 @@ const storage = multer.diskStorage({
 
 const cargar = multer({ storage });
 
-router.post("/",verificarToken, cargar.single("image"), async function (req, res) {
+router.post("/", cargar.single("image"), async function (req, res) {
     const { nombre, precio, cantidaDisponible, descri, cantida } = req.body;
     const imageUrl = `http://localhost:3000/uploads/${req.file.filename}`;
 
@@ -59,7 +59,7 @@ router.get("/", async (req, res) => {
     }
 });
 
-router.put("/:id",verificarToken, cargar.single("image"), async (req, res) => {
+router.put("/:id", cargar.single("image"), async (req, res) => {
     const { id } = req.params;
     const { nombre, precio, cantidaDisponible, descri } = req.body;
     let imageUrl;
@@ -88,7 +88,7 @@ router.put("/:id",verificarToken, cargar.single("image"), async (req, res) => {
     }
 });
 
-router.delete("/:id",verificarToken, async (req, res) => {
+router.delete("/:id", async (req, res) => {
     const { id } = req.params; 
     try {
         const producto = await Producto.findByIdAndDelete(id);

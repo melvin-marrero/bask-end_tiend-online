@@ -80,9 +80,9 @@ router.put("/:id", cargar.single("image"), async (req, res) => {
 
         const producto = await Producto.findByIdAndUpdate(id, updatedData, { new: true });
         if (!producto) {
-            return res.status(404).json(jesonResponse(404, { error: "Producto no encontrado" }));
+            return res.status(404).json(jesonResponse(404, { error: "Producto no encontrado",producto }));
         }
-        res.status(200).json(jesonResponse(200, { message: "Producto actualizado", producto }));
+        res.status(200).json(jesonResponse(200, { message: "Producto actualizado"}));
     } catch (error) {
         res.status(500).json(jesonResponse(500, { error: "Error al actualizar producto" }));
     }

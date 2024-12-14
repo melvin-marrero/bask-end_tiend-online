@@ -16,11 +16,12 @@ app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 async function conectDB() {
     try {
         await mongoose.connect(process.env.db_conetion);
-        console.log("Conectado a la base de datos >>>>>>>");
+        console.log("Conectado a la base de datos de Atlas... >>>>>>>");
     } catch (error) {
-        console.log(error);
+        console.error("Error al conectar con la base de datos:", error.message);
     }
 }
+
 conectDB();
 
 app.use("/api/iphone", require("./rutas/iphone"));
@@ -32,8 +33,8 @@ app.use("/api/xiaomiAcesory", require("./rutas/xiaomiAcesory"));
 app.use("/api/masBuscado", require("./rutas/masBuscado"));
 app.use('/api/auth', loginRoutes);
 
-app.listen(3000);
-console.log(`Servidor corriendo en el puerto ${3000}`);
+app.listen(process.env.port);
+console.log(`Servidor corriendo en el puerto ${process.env.port}`);
 
 app.get("/", (req, res) => {
     res.send("Hola mundo");

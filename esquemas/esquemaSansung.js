@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 
 const sansungSquema =new mongoose.Schema({
-    id:{type:Object},
     nombre:{type:String,require:true,unique:true},
     precio:{type:Number,require:true,},
     cantidaDisponible:{type:Number,require:true},
@@ -12,9 +11,11 @@ const sansungSquema =new mongoose.Schema({
 
 
 
-sansungSquema.methods.pruductExit = async function(nombre){
-  const result = await mongoose.model("Sansung").find({ nombre:nombre });
+sansungSquema.methods.pruductExit = async function (nombre) {
+  const result = await mongoose.model("Sansung").find({ nombre });
   return result.length > 0;
-}
+};
+
+
 
 module.exports = mongoose.model("Sansung",sansungSquema);
