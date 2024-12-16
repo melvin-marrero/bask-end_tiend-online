@@ -22,7 +22,7 @@ const cargar = multer({ storage });
 
 router.post("/", cargar.single("image"), async function (req, res) {
     const { nombre, precio, cantidaDisponible, descri, cantida } = req.body;
-    const imageUrl = `http://localhost:3000/uploads/${req.file.filename}`;
+    const imageUrl = `https://bask-end-tiend-online.onrender.com/uploads/${req.file.filename}`;
 
     if (!nombre || !precio || !cantidaDisponible || !descri || !imageUrl || !cantida) {
         return res.status(402).json(
@@ -66,7 +66,7 @@ router.put("/:id", cargar.single("image"), async (req, res) => {
 
     // Si se proporciona una nueva imagen, actualizar la URL
     if (req.file) {
-        imageUrl = `http://localhost:3000/uploads/${req.file.filename}`;
+        imageUrl = `https://bask-end-tiend-online.onrender.com/uploads/${req.file.filename}`;
     }
 
     try {
