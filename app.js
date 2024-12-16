@@ -7,7 +7,7 @@ const loginRoutes = require("./rutas/auth");
 
 const app = express();
 app.use(cors({
-    origin: 'https://bask-end-tiend-online.onrender.com' 
+    origin: 'https://tienda-onlinee.netlify.app/' 
   }));
   
 app.use(express.json());
