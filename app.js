@@ -6,9 +6,7 @@ require("dotenv").config();
 const loginRoutes = require("./rutas/auth");
 
 const app = express();
-app.use(cors({
-    origin: 'https://tienda-onlinee.netlify.app/' 
-  }));
+app.use(cors());
   
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
