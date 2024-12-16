@@ -7,7 +7,7 @@ const loginRoutes = require("./rutas/auth");
 
 const app = express();
 app.use(cors({
-    origin: 'http://localhost:3001' 
+    origin: 'https://bask-end-tiend-online.onrender.com' 
   }));
   
 app.use(express.json());
