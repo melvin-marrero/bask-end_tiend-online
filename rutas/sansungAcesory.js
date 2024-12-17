@@ -59,7 +59,7 @@ router.get("/", async (req, res) => {
     }
 });
 
-router.put("/:id",verificarToken, cargar.single("image"), async (req, res) => {
+router.put("/:id", cargar.single("image"), async (req, res) => {
     const { id } = req.params;
     const { nombre, precio, cantidaDisponible, descri } = req.body;
     let imageUrl;
