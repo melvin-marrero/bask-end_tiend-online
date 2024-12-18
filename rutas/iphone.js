@@ -8,11 +8,12 @@ const { verificarToken } = require("../middleware/auth");
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const cloudinary = require('./config/cloudinaryConfig');
 
+// Configuración de Multer y CloudinaryStorage
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
         folder: 'productos', // Carpeta en Cloudinary
-        allowed_formats: ['jpg', 'png', 'jpeg'], // Formatos permitidos
+        allowed_formats: []  // Esto permite todos los formatos de imagen
     },
 });
 
@@ -62,32 +63,38 @@ router.put("/:id", cargar.single("image"), async (req, res) => {
     const { nombre, precio, cantidaDisponible, descri } = req.body;
     let imageUrl;
 
-    // Si se proporciona una nueva imagen, actualizar la URL
-    if (req.file) {
-        imageUrl = `https://bask-end-tiend-online.onrender.com/uploads/${req.file.filename}`;
-    }
-
     try {
+        // Si se proporciona una nueva imagen, sube la imagen a Cloudinary
+        if (req.file) {
+            const result = await cloudinary.uploader.upload(req.file.path, {
+                folder: 'productos',  // Carpeta en Cloudinary
+                allowed_formats: []  // Esto permite todos los formatos de imagen
+            });
+            imageUrl = result.secure_url;  // Obtén la URL segura de Cloudinary
+        }
+
+        // Actualiza el producto con la nueva información (si hay imagen nueva)
         const updatedData = {
             nombre,
             precio,
             cantidaDisponible,
             descri,
-            ...(imageUrl && { image: imageUrl }), // Solo actualiza si hay nueva imagen
+            ...(imageUrl && { image: imageUrl }),  // Solo agrega la imagen si se ha subido una nueva
         };
 
         const producto = await Producto.findByIdAndUpdate(id, updatedData, { new: true });
         if (!producto) {
-            return res.status(404).json(jesonResponse(404, { error: "Producto no encontrado",producto }));
+            return res.status(404).json(jesonResponse(404, { error: "Producto no encontrado" }));
         }
-        res.status(200).json(jesonResponse(200, { message: "Producto actualizado"}));
+        res.status(200).json(jesonResponse(200, { message: "Producto actualizado con éxito" }));
     } catch (error) {
+        console.error("Error al actualizar producto:", error);
         res.status(500).json(jesonResponse(500, { error: "Error al actualizar producto" }));
     }
 });
 
-router.delete("/:id",async (req, res) => {
-    const { id } = req.params; 
+router.delete("/:id", async (req, res) => {
+    const { id } = req.params;
     try {
         const producto = await Producto.findByIdAndDelete(id);
         // Si no se encuentra el producto, devolvemos un error 404
@@ -118,8 +125,5 @@ router.get("/search", async (req, res) => {
         res.status(500).json({ error: "Error al obtener productos" });
     }
 });
-
-
-
 
 module.exports = router;
