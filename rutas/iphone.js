@@ -5,24 +5,22 @@ const Producto = require("../esquemas/esquemaProducto");
 const multer = require("multer");
 const path = require("path");
 const { verificarToken } = require("../middleware/auth");
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const cloudinary = require('./config/cloudinaryConfig');
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, './public/uploads');
+const storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: 'productos', // Carpeta en Cloudinary
+        allowed_formats: ['jpg', 'png', 'jpeg'], // Formatos permitidos
     },
-    filename: (req, file, cb) => {
-        if (file !== null) {
-            const ext = file.originalname.split(".").pop();
-            cb(null, Date.now() + "." + ext);
-        }
-    }
 });
 
 const cargar = multer({ storage });
 
 router.post("/", cargar.single("image"), async function (req, res) {
     const { nombre, precio, cantidaDisponible, descri, cantida } = req.body;
-    const imageUrl = `https://bask-end-tiend-online.onrender.com/uploads/${req.file.filename}`;
+    const imageUrl = req.file.path;
 
     if (!nombre || !precio || !cantidaDisponible || !descri || !imageUrl || !cantida) {
         return res.status(402).json(
