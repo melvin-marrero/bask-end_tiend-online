@@ -21,7 +21,7 @@ const cargar = multer({ storage });
 
 router.post("/", cargar.single("image"), async function (req, res) {
     const { nombre, precio, cantidaDisponible, descri, cantida } = req.body;
-    const imageUrl = req.file.path;
+    const imageUrl = req.file?.path;
 
     if (!nombre || !precio || !cantidaDisponible || !descri || !imageUrl || !cantida) {
         return res.status(402).json(
@@ -43,8 +43,10 @@ router.post("/", cargar.single("image"), async function (req, res) {
             res.status(200).json(jesonResponse(200, { message: "Producto agregado con éxito" }));
         }
     } catch (error) {
+        console.error("Error al crear producto:", error);
         return res.status(500).json(jesonResponse(500, {
-            error: "Error al crear producto"
+            error: "Error al crear producto",
+            detalles: error.message,
         }));
     }
 });
