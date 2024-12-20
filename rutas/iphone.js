@@ -6,7 +6,7 @@ const multer = require("multer");
 const path = require("path");
 const { verificarToken } = require("../middleware/auth");
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
-const cloudinary = require('./config/cloudinaryConfig');
+const cloudinary = require('../config/cloudinaryConfig');
 
 // Configuración de Multer y CloudinaryStorage
 const storage = new CloudinaryStorage({
