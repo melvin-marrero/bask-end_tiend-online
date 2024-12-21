@@ -19,6 +19,7 @@ const storage = new CloudinaryStorage({
 
 const cargar = multer({ storage });
 
+// Ruta POST para agregar producto
 router.post("/", cargar.single("image"), async function (req, res) {
     const { nombre, precio, cantidaDisponible, descri, cantida } = req.body;
     const imageUrl = req.file?.path;
@@ -38,7 +39,14 @@ router.post("/", cargar.single("image"), async function (req, res) {
                 error: "Este producto ya existe"
             }));
         } else {
-            const newPruducto = new Producto({ nombre, precio, cantidaDisponible, descri, cantida, image: imageUrl });
+            const newPruducto = new Producto({ 
+                nombre, 
+                precio, 
+                cantidaDisponible, 
+                descri, 
+                cantida, 
+                image: imageUrl 
+            });
             await newPruducto.save();
             res.status(200).json(jesonResponse(200, { message: "Producto agregado con éxito" }));
         }
@@ -50,6 +58,7 @@ router.post("/", cargar.single("image"), async function (req, res) {
         }));
     }
 });
+
 
 router.get("/", async (req, res) => {
     try {
