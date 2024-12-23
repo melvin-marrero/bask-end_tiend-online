@@ -9,18 +9,3 @@ cloudinary.config({
 
 module.exports = cloudinary;
 
-// Función de prueba de subida a Cloudinary
-async function testUpload() {
-    try {
-        const result = await cloudinary.uploader.upload("./public/uploads/cargador-auto.jpg", {
-            folder: 'test-folder', // Carpeta en Cloudinary donde se subirá la imagen
-        });
-        console.log("Upload exitoso:", result);
-    } catch (error) {
-        console.error("Error en la subida de prueba:", error.message);
-    }
-}
-
-// Llamar a la función de prueba
-testUpload();
-module.exports = cloudinary;

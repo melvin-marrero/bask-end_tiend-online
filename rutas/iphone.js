@@ -13,7 +13,7 @@ const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
         folder: 'productos', // Carpeta en Cloudinary
-        allowed_formats: []  // Esto permite todos los formatos de imagen
+        allowed_formats: ['jpg', 'png', 'jpeg','JFIF',]  // Esto permite todos los formatos de imagen
     },
 });
 
@@ -77,11 +77,15 @@ router.put("/:id", cargar.single("image"), async (req, res) => {
     try {
         // Si se proporciona una nueva imagen, sube la imagen a Cloudinary
         if (req.file) {
-            const result = await cloudinary.uploader.upload(req.file.path, {
-                folder: 'productos',  // Carpeta en Cloudinary
-                allowed_formats: []  // Esto permite todos los formatos de imagen
-            });
-            imageUrl = result.secure_url;  // Obtén la URL segura de Cloudinary
+            try {
+                const result = await cloudinary.uploader.upload(req.file.path, {
+                    folder: 'productos',
+                });
+                imageUrl = result.secure_url;
+            } catch (error) {
+                console.error("Error al subir imagen a Cloudinary:", error);
+                return res.status(500).json(jesonResponse(500, { error: "Error al subir la imagen a Cloudinary" }));
+            }
         }
 
         // Actualiza el producto con la nueva información (si hay imagen nueva)
