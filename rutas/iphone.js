@@ -3,19 +3,25 @@ const { jesonResponse } = require("../biblioteca/jesonResponse");
 const router = express.Router();
 const Producto = require("../esquemas/esquemaProducto");
 const multer = require("multer");
-const path = require("path");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary = require("cloudinary").v2;
 const { verificarToken } = require("../middleware/auth");
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, './public/uploads');
+// Configurar Cloudinary
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME, // Configura las variables en tu archivo .env
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// Configuración de almacenamiento en Cloudinary
+const storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: "productos", // Carpeta en Cloudinary
+        format: async (req, file) => "png", // Formato deseado (opcional)
+        public_id: (req, file) => Date.now(), // Nombre único basado en la fecha
     },
-    filename: (req, file, cb) => {
-        if (file !== null) {
-            const ext = file.originalname.split(".").pop();
-            cb(null, Date.now() + "." + ext);
-        }
-    }
 });
 
 const cargar = multer({ storage });
@@ -23,30 +29,31 @@ const cargar = multer({ storage });
 // Ruta POST para agregar producto
 router.post("/", cargar.single("image"), async function (req, res) {
     const { nombre, precio, cantidaDisponible, descri, cantida } = req.body;
-    const imageUrl = `https://bask-end-tiend-online.onrender.com/uploads/${req.file.filename}`;
+    const imageUrl = req.file?.path; // URL generada por Cloudinary
 
     if (!nombre || !precio || !cantidaDisponible || !descri || !imageUrl || !cantida) {
         return res.status(402).json(
             jesonResponse(402, {
-                error: "Los campos son requeridos"
+                error: "Los campos son requeridos",
             })
         );
     }
+
     try {
         const producto = new Producto();
         const exitProduct = await producto.pruductExit(nombre);
         if (exitProduct) {
             return res.status(400).json(jesonResponse(400, {
-                error: "Este producto ya existe"
+                error: "Este producto ya existe",
             }));
         } else {
-            const newPruducto = new Producto({ 
-                nombre, 
-                precio, 
-                cantidaDisponible, 
-                descri, 
-                cantida, 
-                image: imageUrl 
+            const newPruducto = new Producto({
+                nombre,
+                precio,
+                cantidaDisponible,
+                descri,
+                cantida,
+                image: imageUrl, // URL de Cloudinary
             });
             await newPruducto.save();
             res.status(200).json(jesonResponse(200, { message: "Producto agregado con éxito" }));
@@ -77,20 +84,18 @@ router.put("/:id", cargar.single("image"), async (req, res) => {
     let imageUrl;
 
     if (req.file) {
-        imageUrl = `https://bask-end-tiend-online.onrender.com/uploads/${req.file.filename}`;
+        imageUrl = req.file.path; // URL de Cloudinary
     }
 
     try {
-        // Construir los datos a actualizar
         const updateData = { nombre, precio, cantidaDisponible, descri, cantida };
         if (imageUrl) {
-            updateData.image = imageUrl; // Solo agregar la imagen si se subió
+            updateData.image = imageUrl;
         }
 
-        // Actualizar el producto
         const productoActualizado = await Producto.findByIdAndUpdate(id, updateData, {
-            new: true, // Devuelve el documento actualizado
-            runValidators: true // Verifica las validaciones definidas en el esquema
+            new: true,
+            runValidators: true,
         });
 
         if (!productoActualizado) {
