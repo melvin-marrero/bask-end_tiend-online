@@ -5,16 +5,17 @@ const Producto = require("../esquemas/esquemaProducto");
 const multer = require("multer");
 const path = require("path");
 const { verificarToken } = require("../middleware/auth");
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
-const cloudinary = require('../config/cloudinaryConfig');
 
-// Configuración de Multer y CloudinaryStorage
-const storage = new CloudinaryStorage({
-    cloudinary: cloudinary,
-    params: {
-        folder: 'productos', // Carpeta en Cloudinary
-        allowed_formats: ['jpg', 'png', 'jpeg','JFIF',]  // Esto permite todos los formatos de imagen
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, './public/uploads');
     },
+    filename: (req, file, cb) => {
+        if (file !== null) {
+            const ext = file.originalname.split(".").pop();
+            cb(null, Date.now() + "." + ext);
+        }
+    }
 });
 
 const cargar = multer({ storage });
@@ -22,7 +23,7 @@ const cargar = multer({ storage });
 // Ruta POST para agregar producto
 router.post("/", cargar.single("image"), async function (req, res) {
     const { nombre, precio, cantidaDisponible, descri, cantida } = req.body;
-    const imageUrl = req.file?.path;
+    const imageUrl = `https://bask-end-tiend-online.onrender.com/uploads/${req.file.filename}`;
 
     if (!nombre || !precio || !cantidaDisponible || !descri || !imageUrl || !cantida) {
         return res.status(402).json(
@@ -69,42 +70,37 @@ router.get("/", async (req, res) => {
     }
 });
 
+// Ruta para actualizar un producto
 router.put("/:id", cargar.single("image"), async (req, res) => {
     const { id } = req.params;
-    const { nombre, precio, cantidaDisponible, descri } = req.body;
+    const { nombre, precio, cantidaDisponible, descri, cantida } = req.body;
     let imageUrl;
 
+    if (req.file) {
+        imageUrl = `https://bask-end-tiend-online.onrender.com/uploads/${req.file.filename}`;
+    }
+
     try {
-        // Si se proporciona una nueva imagen, sube la imagen a Cloudinary
-        if (req.file) {
-            try {
-                const result = await cloudinary.uploader.upload(req.file.path, {
-                    folder: 'productos',
-                });
-                imageUrl = result.secure_url;
-            } catch (error) {
-                console.error("Error al subir imagen a Cloudinary:", error);
-                return res.status(500).json(jesonResponse(500, { error: "Error al subir la imagen a Cloudinary" }));
-            }
+        // Construir los datos a actualizar
+        const updateData = { nombre, precio, cantidaDisponible, descri, cantida };
+        if (imageUrl) {
+            updateData.image = imageUrl; // Solo agregar la imagen si se subió
         }
 
-        // Actualiza el producto con la nueva información (si hay imagen nueva)
-        const updatedData = {
-            nombre,
-            precio,
-            cantidaDisponible,
-            descri,
-            ...(imageUrl && { image: imageUrl }),  // Solo agrega la imagen si se ha subido una nueva
-        };
+        // Actualizar el producto
+        const productoActualizado = await Producto.findByIdAndUpdate(id, updateData, {
+            new: true, // Devuelve el documento actualizado
+            runValidators: true // Verifica las validaciones definidas en el esquema
+        });
 
-        const producto = await Producto.findByIdAndUpdate(id, updatedData, { new: true });
-        if (!producto) {
+        if (!productoActualizado) {
             return res.status(404).json(jesonResponse(404, { error: "Producto no encontrado" }));
         }
-        res.status(200).json(jesonResponse(200, { message: "Producto actualizado con éxito" }));
+
+        res.status(200).json(jesonResponse(200, { message: "Producto actualizado con éxito", producto: productoActualizado }));
     } catch (error) {
-        console.error("Error al actualizar producto:", error);
-        res.status(500).json(jesonResponse(500, { error: "Error al actualizar producto" }));
+        console.error("Error al actualizar el producto:", error);
+        res.status(500).json(jesonResponse(500, { error: "Error al actualizar el producto" }));
     }
 });
 
