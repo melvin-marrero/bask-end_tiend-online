@@ -29,7 +29,7 @@ const cargar = multer({ storage });
 // Ruta POST para agregar producto
 router.post("/", cargar.single("image"), async function (req, res) {
     const { nombre, precio, cantidaDisponible, descri, cantida } = req.body;
-    const imageUrl = req.file?.path; // URL generada por Cloudinary
+    const imageUrl = `https://res.cloudinary.com/demo/image/upload/getting-started/shoes.jpg/${req.file.filename}`; // URL generada por Cloudinary
 
     if (!nombre || !precio || !cantidaDisponible || !descri || !imageUrl || !cantida) {
         return res.status(402).json(
