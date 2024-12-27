@@ -2,16 +2,16 @@ const cloudinary = require("cloudinary").v2;
 
 // Configuración
 cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
+    cloud_name: "dcizijq9y", // Reemplaza con tu valor exacto
+    api_key: "587669285117954", // Reemplaza con tu clave exacta
+    api_secret: "EGctlcpRhz1B9hL5swHYMEU0WKg", // Reemplaza con tu secreto exacto
 });
 
 // Ruta a la imagen
-const rutaImagen = "public/upload/producto2.jpg";
+const path = require("path");
 
-// Subir imagen
-cloudinary.uploader.upload(rutaImagen, { folder: "productos" })
+const filePath = path.resolve(__dirname, "public", "upload", "producto2.jpg");
+cloudinary.uploader.upload(filePath, { folder: "productos" })
     .then((result) => {
         console.log("Subida exitosa:", result.secure_url);
     })

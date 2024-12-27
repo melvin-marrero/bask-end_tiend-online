@@ -9,7 +9,9 @@ const { verificarToken } = require("../middleware/auth");
 
 // Configurar Cloudinary
 cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_URL // Configura las variables en tu archivo .env
+    cloud_name: "dcizijq9y", 
+    api_key: "587669285117954",
+    api_secret: "EGctlcpRhz1B9hL5swHYMEU0WKg",
 });
 
 // Configuración de almacenamiento en Cloudinary
@@ -17,10 +19,15 @@ const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
         folder: "productos", // Carpeta en Cloudinary
-        format: async (req, file) => "png", // Formato deseado (opcional)
+        format: async (req, file) => {
+            // Obtén el formato de la imagen a partir de la extensión del archivo
+            const format = file.originalname.split('.').pop(); // Obtiene el formato basado en la extensión del archivo
+            return format; // Devuelve el formato del archivo
+        },
         public_id: (req, file) => Date.now(), // Nombre único basado en la fecha
     },
 });
+
 
 const cargar = multer({ storage });
 
