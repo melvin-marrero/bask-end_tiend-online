@@ -69,6 +69,15 @@ router.post("/", cargar.single("image"), async function (req, res) {
     }
 });
 
+router.get("/", async (req, res) => {
+    try {
+        const productos = await Producto.find(); // Obtener todos los productos
+        res.json(productos); // Enviar los productos como respuesta
+    } catch (error) {
+        res.status(500).json(jesonResponse(500, { error: "Error al obtener productos" }));
+    }
+});
+
 router.put("/:id", cargar.single("image"), async (req, res) => {
     const { id } = req.params;
     const { nombre, precio, cantidaDisponible, descri, cantida } = req.body;
