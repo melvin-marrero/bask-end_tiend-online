@@ -15,30 +15,21 @@ cloudinary.config({
 });
 
 // Configuración de almacenamiento en Cloudinary
-const cargar = multer({ 
-    storage,
-    limits: { fileSize: 5 * 1024 * 1024 }, // Limitar tamaño de archivo a 5MB
-    fileFilter: (req, file, cb) => {
-        if (!file.mimetype.startsWith("image/")) {
-            return cb(new Error("Solo se permiten imágenes"), false);
-        }
-        cb(null, true);
+const storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: "productos", // Carpeta en Cloudinary
+        format: async (req, file) => "png", // Formato deseado (opcional)
+        public_id: (req, file) => Date.now(), // Nombre único basado en la fecha
     },
-}).single("image");
+});
 
+const cargar = multer({ storage });
 
 // Ruta POST para agregar producto
 router.post("/", cargar.single("image"), async function (req, res) {
     const { nombre, precio, cantidaDisponible, descri, cantida } = req.body;
     const imageUrl = req.file.path; // URL generada por Cloudinary
-    console.log("Archivo recibido:", req.file);
-    console.log("Cuerpo de la solicitud:", req.body);
-
-    if (!req.file) {
-        return res.status(400).json(
-            jesonResponse(400, { error: "Se requiere una imagen para el producto." })
-        );
-    }
 
     if (!nombre || !precio || !cantidaDisponible || !descri || !imageUrl || !cantida) {
         return res.status(402).json(
