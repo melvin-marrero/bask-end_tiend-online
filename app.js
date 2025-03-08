@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const path = require("path");
 require("dotenv").config();
 const loginRoutes = require("./rutas/auth");
+const paypalPago = require("./rutas/paypalPago");
 
 const app = express();
 app.use(cors());
@@ -30,6 +31,7 @@ app.use("/api/sansungAcesory", require("./rutas/sansungAcesory"));
 app.use("/api/xiaomiAcesory", require("./rutas/xiaomiAcesory"));
 app.use("/api/masBuscado", require("./rutas/masBuscado"));
 app.use('/api/auth', loginRoutes);
+app.use("/api/paypal", paypalPago);
 
 app.listen(process.env.port);
 console.log(`Servidor corriendo en el puerto ${process.env.port}`);
