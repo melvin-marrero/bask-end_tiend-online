@@ -6,7 +6,7 @@ const pagoSchema = new mongoose.Schema({
   currency: String,
   orderId: String,
   createdAt: { type: Date, default: Date.now },
-});
+},{versionKey:false});
 
 const Pago = mongoose.model("Pago", pagoSchema);
 module.exports = Pago;

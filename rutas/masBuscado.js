@@ -110,7 +110,7 @@ router.put("/:id", cargar.single("image"), async (req, res) => {
 });
 
 router.delete("/:id", async (req, res) => {
-    const { id } = req.params; 
+    const { id } = req.params;
     try {
         const producto = await Producto.findByIdAndDelete(id);
         // Si no se encuentra el producto, devolvemos un error 404
